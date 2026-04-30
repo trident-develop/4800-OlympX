@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "122456399880",
+    "project_id": "olympx-77e5b",
+    "storage_bucket": "olympx-77e5b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122456399880:android:7e58436f0fe7452cdab1bd",
+        "android_client_info": {
+          "package_name": "com.cjoshppingph"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqnszvT6aHnL00ZVe5HGLkf0F-6mf107Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
