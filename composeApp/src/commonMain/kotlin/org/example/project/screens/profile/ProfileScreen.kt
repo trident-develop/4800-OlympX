@@ -91,6 +91,7 @@ fun ProfileScreen(onOpenWeb: (String) -> Unit) {
     val picker = LocalMediaPicker.current
     val focusManager = LocalFocusManager.current
     var sheetOpen by remember { mutableStateOf(false) }
+    var presetPickerOpen by remember { mutableStateOf(false) }
     var permanentlyDenied by remember { mutableStateOf<String?>(null) }
     var confirmReset by remember { mutableStateOf(false) }
 
@@ -117,7 +118,12 @@ fun ProfileScreen(onOpenWeb: (String) -> Unit) {
     ) {
         ProfileHeaderFixed(
             profile = profile,
-            onChangePhoto = { sheetOpen = true },
+            onChangePhoto = {
+                when (currentPlatform) {
+                    TargetPlatform.Android -> sheetOpen = true
+                    TargetPlatform.Ios -> presetPickerOpen = true
+                }
+            },
         )
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 90.dp),
@@ -155,6 +161,16 @@ fun ProfileScreen(onOpenWeb: (String) -> Unit) {
                 picker.pickFromGallery(handleOutcome)
             },
         )
+    )
+
+    PresetPortraitPicker(
+        visible = presetPickerOpen,
+        selectedIndex = profile.imageBytes?.presetIndexOrNull(),
+        onDismiss = { presetPickerOpen = false },
+        onSelect = { idx ->
+            profile.setImage(presetBytes(idx))
+            presetPickerOpen = false
+        },
     )
 
     MythicDialog(
@@ -351,7 +367,10 @@ private fun ProfileIdentity(profile: ProfileState) {
 
 @Composable
 private fun AvatarDisplay(bytes: ByteArray?, modifier: Modifier = Modifier) {
-    val image = remember(bytes) { bytes?.let { decodeImageBitmap(it) } }
+    val presetIndex = remember(bytes) { bytes?.presetIndexOrNull() }
+    val image = remember(bytes, presetIndex) {
+        if (presetIndex == null) bytes?.let { decodeImageBitmap(it) } else null
+    }
     Box(
         modifier = modifier
             .clip(CircleShape)
@@ -363,15 +382,15 @@ private fun AvatarDisplay(bytes: ByteArray?, modifier: Modifier = Modifier) {
             .border(2.dp, MythColors.CyanBright.copy(alpha = 0.7f), CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        if (image != null) {
-            Image(
+        when {
+            presetIndex != null -> PresetPortrait(presetIndex, modifier = Modifier.fillMaxSize())
+            image != null -> Image(
                 bitmap = image,
                 contentDescription = "Profile",
                 modifier = Modifier.fillMaxSize().clip(CircleShape),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
             )
-        } else {
-            DefaultAvatarArt()
+            else -> DefaultAvatarArt()
         }
     }
 }
@@ -994,6 +1013,119 @@ private fun ChronicleStat(label: String, value: Int, color: Color, modifier: Mod
                 fontWeight = FontWeight.Bold,
             )
         }
+    }
+}
+
+@Composable
+private fun PresetPortraitPicker(
+    visible: Boolean,
+    selectedIndex: Int?,
+    onDismiss: () -> Unit,
+    onSelect: (Int) -> Unit,
+) {
+    MythicDialog(
+        visible = visible,
+        onDismiss = onDismiss,
+        title = "Choose a portrait",
+        message = "Pick a sigil to wear into the trials.",
+        dismissLabel = "Close",
+        content = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    PresetTile(0, selectedIndex == 0, onSelect, modifier = Modifier.weight(1f))
+                    PresetTile(1, selectedIndex == 1, onSelect, modifier = Modifier.weight(1f))
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    PresetTile(2, selectedIndex == 2, onSelect, modifier = Modifier.weight(1f))
+                    PresetTile(3, selectedIndex == 3, onSelect, modifier = Modifier.weight(1f))
+                }
+            }
+        },
+    )
+}
+
+@Composable
+private fun PresetTile(
+    index: Int,
+    selected: Boolean,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val info = presetPortraitInfo[index]
+    val interaction = remember { MutableInteractionSource() }
+    val accent = if (selected) MythColors.CyanBright else MythColors.DividerSoft
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        if (selected) MythColors.Cyan.copy(alpha = 0.22f) else MythColors.Surface.copy(alpha = 0.5f),
+                        MythColors.BgDeep,
+                    )
+                )
+            )
+            .border(
+                width = if (selected) 1.6.dp else 1.dp,
+                color = accent,
+                shape = RoundedCornerShape(16.dp),
+            )
+            .clickable(interactionSource = interaction, indication = null) { onSelect(index) }
+            .padding(12.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(96.dp)
+                .clip(CircleShape)
+                .background(
+                    Brush.radialGradient(listOf(MythColors.Surface, MythColors.BgDeep))
+                )
+                .border(1.5.dp, accent.copy(alpha = 0.85f), CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            PresetPortrait(index, modifier = Modifier.fillMaxSize())
+            if (selected) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .background(MythColors.CyanBright)
+                        .border(1.dp, MythColors.BgDeep, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        "✓",
+                        color = MythColors.BgDeep,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            info.title,
+            color = MythColors.TextPrimary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.6.sp,
+        )
+        Text(
+            info.subtitle,
+            color = MythColors.TextSecondary,
+            fontSize = 10.sp,
+            letterSpacing = 0.4.sp,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 

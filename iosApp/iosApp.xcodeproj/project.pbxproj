@@ -180,9 +180,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "OlympX needs access to the camera so you can capture a portrait for your mythic profile.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "OlympX needs permission to save photos you capture through the app.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "OlympX needs access to your photo library so you can pick an image for your mythic profile.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -338,9 +335,6 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "OlympX needs access to the camera so you can capture a portrait for your mythic profile.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "OlympX needs permission to save photos you capture through the app.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "OlympX needs access to your photo library so you can pick an image for your mythic profile.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
