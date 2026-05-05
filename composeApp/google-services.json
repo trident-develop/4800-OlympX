@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:122456399880:android:7e58436f0fe7452cdab1bd",
+        "mobilesdk_app_id": "1:122456399880:android:bc451a8bdb08c395dab1bd",
         "android_client_info": {
-          "package_name": "com.cjoshppingph"
+          "package_name": "com.sofish.soeasymahjong"
         }
       },
       "oauth_client": [],
