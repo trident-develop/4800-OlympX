@@ -11,16 +11,23 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import org.example.project.android.AppContextHolder
+import org.example.project.db.GameRepo
+import org.example.project.platform.privacy.TV3
+import org.koin.android.ext.android.inject
+import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
 
     private var multiTouchDetected = false
+    lateinit var TV3: TV3
+    private val gameRepo: GameRepo by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         AppContextHolder.application = application
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         hideSystemBars()
+        TV3 = TV3(this, gameRepo)
         setContent {
             App()
         }
@@ -58,6 +65,11 @@ class MainActivity : ComponentActivity() {
             return true
         }
         return super.dispatchTouchEvent(ev)
+    }
+
+    override fun onDestroy() {
+        TV3.destroy()
+        super.onDestroy()
     }
 }
 

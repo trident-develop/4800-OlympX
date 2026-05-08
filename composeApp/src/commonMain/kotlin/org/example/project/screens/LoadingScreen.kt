@@ -9,6 +9,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,13 +34,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.input.key.Key.Companion.R
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import olympx.composeapp.generated.resources.Res
+import olympx.composeapp.generated.resources.bg_1
+import olympx.composeapp.generated.resources.zeus
+import org.example.project.DisableBack
 import org.example.project.theme.MythColors
 import org.example.project.ui.effects.AuroraBackground
 import org.example.project.ui.effects.ParticleField
 import org.example.project.ui.effects.mythShimmer
+import org.jetbrains.compose.resources.painterResource
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.min
@@ -50,6 +59,7 @@ fun LoadingScreen() {
     // Progress counter: shoots to 60 % quickly, then crawls toward 99 %.
     // Capped at 99 so it never visually "completes" — the 2-second gate in
     // AppGate is what actually advances the app.
+    DisableBack()
     val progress = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
         // Fast ramp to 60 %, then progressively slower segments so the
@@ -69,6 +79,12 @@ fun LoadingScreen() {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
+            Image(
+                painter = painterResource(Res.drawable.bg_1),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -77,24 +93,17 @@ fun LoadingScreen() {
                 Spacer(Modifier.height(32.dp))
                 Text(
                     text = "AWAKENING THE PANTHEON",
-                    color = MythColors.TextPrimary,
-                    fontSize = 14.sp,
+                    color = MythColors.Surface,
+                    fontSize = 17.sp,
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 4.sp,
                     modifier = Modifier.mythShimmer()
                 )
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    text = "summoning ancient tides...",
-                    color = MythColors.TextSecondary.copy(alpha = 0.85f),
-                    fontSize = 12.sp,
-                    letterSpacing = 2.sp,
-                )
-                Spacer(Modifier.height(20.dp))
-                Text(
                     text = "$percent%",
-                    color = MythColors.CyanBright,
-                    fontSize = 30.sp,
+                    color = MythColors.Surface,
+                    fontSize = 40.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 3.sp,
                 )
@@ -142,8 +151,8 @@ private fun MythicSigil() {
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        MythColors.Cyan.copy(alpha = 0.6f * glow),
-                        MythColors.Azure.copy(alpha = 0.25f * glow),
+                        MythColors.Gold.copy(alpha = 0.6f * glow),
+                        MythColors.Gold.copy(alpha = 0.25f * glow),
                         Color.Transparent,
                     ),
                     center = Offset(size.width / 2, size.height / 2),
@@ -157,17 +166,17 @@ private fun MythicSigil() {
             val center = Offset(size.width / 2, size.height / 2)
             val radius = min(size.width, size.height) / 2f * 0.88f
             drawCircle(
-                color = MythColors.Cyan.copy(alpha = 0.9f),
+                color = MythColors.Gold.copy(alpha = 0.9f),
                 radius = radius,
                 center = center,
-                style = Stroke(width = 1.2f)
+                style = Stroke(width = 16.2f)
             )
             drawCircle(
-                color = MythColors.CyanBright.copy(alpha = 0.6f),
+                color = MythColors.Gold.copy(alpha = 0.6f),
                 radius = radius * 0.96f,
                 center = center,
                 style = Stroke(
-                    width = 1f,
+                    width = 8f,
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 10f))
                 )
             )
@@ -192,7 +201,7 @@ private fun MythicSigil() {
                 radius = radius,
                 center = center,
                 style = Stroke(
-                    width = 1.5f,
+                    width = 2.5f,
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(18f, 14f))
                 )
             )
@@ -203,7 +212,7 @@ private fun MythicSigil() {
                     color = MythColors.Gold.copy(alpha = 0.85f),
                     start = Offset(center.x + cos(a1) * radius, center.y + sin(a1) * radius),
                     end = Offset(center.x + cos(a2) * radius, center.y + sin(a2) * radius),
-                    strokeWidth = 1.2f
+                    strokeWidth = 2.2f
                 )
             }
         }
@@ -230,7 +239,7 @@ private fun MythicSigil() {
                         color = MythColors.GoldBright.copy(alpha = 0.9f * glow),
                         start = Offset(center.x - cosA * half, center.y - sinA * half),
                         end = Offset(center.x + cosA * half, center.y + sinA * half),
-                        strokeWidth = 1.6f
+                        strokeWidth = 2.6f
                     )
                 }
                 drawCircle(
@@ -274,11 +283,46 @@ private fun LoadingDots() {
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     drawCircle(
-                        color = MythColors.CyanBright.copy(alpha = 0.35f + 0.65f * phase),
-                        radius = 3f + 2f * phase
+                        color = MythColors.Surface.copy(alpha = 0.35f + 0.65f * phase),
+                        radius = 7f + 2f * phase
                     )
                 }
             }
         }
     }
+}
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    widthDp = 360,
+    heightDp = 640
+)
+
+@Preview(
+    name = "mdpi (160)",
+    widthDp = 320,
+    heightDp = 680,
+    fontScale = 1.0f,
+    showBackground = true,
+    showSystemUi = true
+)
+
+@Preview(
+    name = "hdpi (240)",
+    widthDp = 450,
+    heightDp = 800,
+    fontScale = 1.0f,
+    showBackground = true,
+    showSystemUi = true
+)
+
+@Composable
+private fun ScreenPreview() {
+    LoadingScreen()
 }

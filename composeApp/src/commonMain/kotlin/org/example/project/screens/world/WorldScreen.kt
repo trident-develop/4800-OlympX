@@ -68,6 +68,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.example.project.QuitGame
 import org.example.project.platform.loadVisitedPlaces
 import org.example.project.platform.saveVisitedPlaces
 import org.example.project.theme.MythColors
@@ -81,6 +82,8 @@ import kotlin.math.sin
 
 @Composable
 fun WorldScreen() {
+    QuitGame()
+
     val realms = WorldCatalog.realms
     val pagerState = rememberPagerState(pageCount = { realms.size })
     var selected by remember { mutableStateOf<HistoricPlace?>(null) }
