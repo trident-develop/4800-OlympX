@@ -1,6 +1,7 @@
 package org.example.project.platform.privacy
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.view.ViewGroup
@@ -30,6 +31,12 @@ class TV3(
 ) : WebView(activity) {
     private val contentRoot: FrameLayout = FrameLayout(activity)
     private var validTarget = false
+
+    private var latestIntent: Intent? = null
+
+    fun updateIntent(intent: Intent?) {
+        latestIntent = intent
+    }
     private val _events = MutableSharedFlow<TVEvent>(extraBufferCapacity = 1)
     val events = _events.asSharedFlow()
     val popupContainer: FrameLayout = FrameLayout(activity).apply {
@@ -160,7 +167,7 @@ class TV3(
                 validTarget = true
                 scoreRepo.saveScore(url)
                 regToken()
-                postback(activity.intent)
+                postback(latestIntent)
                 setViewVisibility(true)
             }
         }

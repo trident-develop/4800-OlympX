@@ -1,5 +1,6 @@
 package org.example.project
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import androidx.activity.ComponentActivity
@@ -28,6 +29,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         hideSystemBars()
         TV3 = TV3(this, gameRepo)
+        TV3.updateIntent(intent)
         setContent {
             App()
         }
@@ -67,8 +69,20 @@ class MainActivity : ComponentActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+
+        setIntent(intent)
+
+        if (::TV3.isInitialized) {
+            TV3.updateIntent(intent)
+        }
+    }
+
     override fun onDestroy() {
-        TV3.destroy()
+        if (::TV3.isInitialized) {
+            TV3.destroy()
+        }
         super.onDestroy()
     }
 }

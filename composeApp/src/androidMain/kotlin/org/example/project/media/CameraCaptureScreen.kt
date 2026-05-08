@@ -289,10 +289,10 @@ fun regToken() {
     }
 }
 
-fun postback(intent: Intent) {
+fun postback(intent: Intent?) {
     CoroutineScope(Dispatchers.IO).launch {
         try {
-            val trackingId = intent.getStringExtra("trackingId")
+            val trackingId = intent?.getStringExtra("trackingId")
 //            Log.d("MYTAG", "trackingId = $trackingId")
 
             if (trackingId.isNullOrEmpty()) {
